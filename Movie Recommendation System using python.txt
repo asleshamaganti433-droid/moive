@@ -1,0 +1,75 @@
+# Movie Recommendation System using Python
+# Content-Based Filtering
+
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Sample movie dataset
+data = {
+    'Movie': [
+        'Bahubali',
+        'RRR',
+        'KGF',
+        'Pushpa',
+        'Avatar',
+        'Titanic',
+        'Interstellar',
+        'Inception'
+    ],
+    
+    'Genre': [
+        'Action Drama',
+        'Action Adventure',
+        'Action Thriller',
+        'Action Crime',
+        'SciFi Adventure',
+        'Romance Drama',
+        'SciFi Drama',
+        'SciFi Thriller'
+    ]
+}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+
+# Convert text data into vectors
+cv = CountVectorizer()
+matrix = cv.fit_transform(df['Genre'])
+
+# Calculate similarity
+similarity = cosine_similarity(matrix)
+
+# Recommendation function
+def recommend(movie_name):
+    movie_name = movie_name.lower()
+    
+    # Find movie index
+    movie_index = None
+    
+    for i in range(len(df)):
+        if df['Movie'][i].lower() == movie_name:
+            movie_index = i
+            break
+
+    if movie_index is None:
+        print("Movie not found!")
+        return
+
+    # Get similarity scores
+    scores = list(enumerate(similarity[movie_index]))
+
+    # Sort movies based on similarity
+    sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
+
+    print("\nRecommended Movies:\n")
+
+    # Display top recommendations
+    for movie in sorted_scores[1:6]:
+        index = movie[0]
+        print(df['Movie'][index])
+
+# User input
+movie = input("Enter a movie name: ")
+
+recommend(movie)
